@@ -1,0 +1,195 @@
+get_prices:
+  call: http.get
+  args:
+    url: https://dashboard.elering.ee/api/nps/price
+  result: prices
+
+step_2:
+  assign:
+    min_price: ${prices.response.body.data.ee[0].price}
+    min_timestamp: ${prices.response.body.data.ee[0].timestamp}
+    price_2: ${prices.response.body.data.ee[1].price}
+    timestamp_2: ${prices.response.body.data.ee[1].timestamp}
+    price_3: ${prices.response.body.data.ee[2].price}
+    timestamp_3: ${prices.response.body.data.ee[2].timestamp}
+    price_4: ${prices.response.body.data.ee[3].price}
+    timestamp_4: ${prices.response.body.data.ee[3].timestamp}
+    price_5: ${prices.response.body.data.ee[4].price}
+    timestamp_5: ${prices.response.body.data.ee[4].timestamp}
+    price_6: ${prices.response.body.data.ee[5].price}
+    timestamp_6: ${prices.response.body.data.ee[5].timestamp}
+    price_7: ${prices.response.body.data.ee[6].price}
+    timestamp_7: ${prices.response.body.data.ee[6].timestamp}
+    price_8: ${prices.response.body.data.ee[7].price}
+    timestamp_8: ${prices.response.body.data.ee[7].timestamp}
+    price_9: ${prices.response.body.data.ee[8].price}
+    timestamp_9: ${prices.response.body.data.ee[8].timestamp}
+    price_10: ${prices.response.body.data.ee[9].price}
+    timestamp_10: ${prices.response.body.data.ee[9].timestamp}
+    price_11: ${prices.response.body.data.ee[10].price}
+    timestamp_11: ${prices.response.body.data.ee[10].timestamp}
+    price_12: ${prices.response.body.data.ee[11].price}
+    timestamp_12: ${prices.response.body.data.ee[11].timestamp}
+    price_13: ${prices.response.body.data.ee[12].price}
+    timestamp_13: ${prices.response.body.data.ee[12].timestamp}
+    price_14: ${prices.response.body.data.ee[13].price}
+    timestamp_14: ${prices.response.body.data.ee[13].timestamp}
+    price_15: ${prices.response.body.data.ee[14].price}
+    timestamp_15: ${prices.response.body.data.ee[14].timestamp}     
+
+step_3:
+  switch:
+    - condition: ${price_2 < min_price}
+      next: step_4
+  next: step_5  
+
+step_4:
+  assign:
+    min_price: ${price_2}
+    min_timestamp: ${timestamp_2}
+
+step_5:
+  switch:
+    - condition: ${price_3 < min_price}
+      next: step_6
+  next: step_7  
+
+step_6:
+  assign:
+    min_price: ${price_3}
+    min_timestamp: ${timestamp_3}
+
+step_7:
+  switch:
+    - condition: ${price_4 < min_price}
+      next: step_8
+  next: step_9  
+
+step_8:
+  assign:
+    min_price: ${price_4}
+    min_timestamp: ${timestamp_4}
+
+step_9:
+  switch:
+    - condition: ${price_5 < min_price}
+      next: step_10
+  next: step_11 
+
+step_10:
+  assign:
+    min_price: ${price_5}
+    min_timestamp: ${timestamp_5}
+
+step_11:
+  switch:
+    - condition: ${price_6 < min_price}
+      next: step_12
+  next: step_13  
+
+step_12:
+  assign:
+    min_price: ${price_6}
+    min_timestamp: ${timestamp_6}
+
+step_13:
+  switch:
+    - condition: ${price_7 < min_price}
+      next: step_14
+  next: step_15  
+
+step_14:
+  assign:
+    min_price: ${price_7}
+    min_timestamp: ${timestamp_7}
+
+step_15:
+  switch:
+    - condition: ${price_8 < min_price}
+      next: step_16
+  next: step_17  
+
+step_16:
+  assign:
+    min_price: ${price_8}
+    min_timestamp: ${timestamp_8}
+
+step_17:
+  switch:
+    - condition: ${price_9 < min_price}
+      next: step_18
+  next: step_19 
+
+step_18:
+  assign:
+    min_price: ${price_9}
+    min_timestamp: ${timestamp_9}
+
+step_19:
+  switch:
+    - condition: ${price_10 < min_price}
+      next: step_20
+  next: step_21  
+
+step_20:
+  assign:
+    min_price: ${price_10}
+    min_timestamp: ${timestamp_10}
+
+step_21:
+  switch:
+    - condition: ${price_11 < min_price}
+      next: step_22
+  next: step_23  
+
+step_22:
+  assign:
+    min_price: ${price_11}
+    min_timestamp: ${timestamp_11}
+
+step_23:
+  switch:
+    - condition: ${price_12 < min_price}
+      next: step_24
+  next: step_25 
+
+step_24:
+  assign:
+    min_price: ${price_12}
+    min_timestamp: ${timestamp_12}
+
+step_25:
+  switch:
+    - condition: ${price_13 < min_price}
+      next: step_26
+  next: step_27  
+
+step_26:
+  assign:
+    min_price: ${price_13}
+    min_timestamp: ${timestamp_13}
+
+step_27:
+  switch:
+    - condition: ${price_14 < min_price}
+      next: step_28
+  next: step_29  
+
+step_28:
+  assign:
+    min_price: ${price_14}
+    min_timestamp: ${timestamp_14}
+
+step_29:
+  switch:
+    - condition: ${price_15 < min_price}
+      next: step_30
+  next: return_value
+
+step_30:
+  assign:
+    min_price: ${price_15}
+    min_timestamp: ${timestamp_15}
+
+return_value:
+  return: ${"Täna on Nordpool elektribörsi odavaim hind kell " + new Date(min_timestamp * 1000).getHours() + ":" + ("0" + new Date(min_timestamp * 1000).getMinutes()).substr(-2) + " ja selleks on " + min_price}
