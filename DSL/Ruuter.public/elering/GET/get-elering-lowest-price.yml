@@ -29,4 +29,4 @@ step_3:
     timeVar: ${new Date(minPriceTimestamp * 1000).getHours() + ":00"}
 
 response:
-  return: ${"Täna on Nordpool elektribörsi odavaim hind kell " + timeVar + " ja selleks on " + minPrice}
+  return: ${"Täna on Nordpool elektribörsi odavaim hind alates kell " + timeVar + " ja selleks on " + minPrice + " EUR/MWh."}
