@@ -68,7 +68,8 @@ switch_step:
       next: return_fail
 
 force_end_step:
-  return: ${"Andmeid ei leitud."}
+  return: null
+  status: 300
   next: end
 
 return_success:
