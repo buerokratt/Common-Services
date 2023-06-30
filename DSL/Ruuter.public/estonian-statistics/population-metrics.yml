@@ -1,0 +1,95 @@
+check_year_param:
+  switch:
+    - condition: ${incoming.params.year == null}
+      next: assign_default_year
+    - condition: ${incoming.params.year != null}
+      next: assign_param_year
+
+assign_default_year:
+  assign:
+    year: ${new Date().getFullYear().toString()}
+  next: check_location_param
+
+assign_param_year:
+  assign:
+    year: ${incoming.params.year}
+
+check_location_param:
+  switch:
+    - condition: ${incoming.params.location == null}
+      next: assign_default_location
+    - condition:  ${incoming.params.location != null}
+      next: assign_param_location
+
+assign_default_location:
+  assign:
+    location: "1"
+  next: get_stat
+
+assign_param_location:
+  assign:
+    location: ${incoming.params.location}
+    location_string: ${incoming.params.location}
+
+convert_location:
+  call: http.post
+  args:
+    url: "http://node:3000/hbs/statlocation"
+    body:
+      location: ${incoming.params.location}
+  result: location_conversion
+
+assign_location:
+  assign:
+    location: ${location_conversion.response.body}
+
+get_stat:
+  call: http.post
+  args:
+    url: "https://andmed.stat.ee/api/v1/et/stat/RV0291U"
+    body:
+      query:
+        - code: "Elukoht"
+          selection:
+            filter: "item"
+            values:
+              - ${location}
+        - code: "Aasta"
+          selection:
+            filter: "item"
+            values:
+              - ${year}
+        - code: "Näitaja"
+          selection:
+            filter: "item"
+            values:
+              - "1"
+      response:
+        format: json-stat2
+  result: result
+
+check_results:
+  switch:
+    - condition: ${result === undefined || result.response.body.value === undefined}
+      next: fail_step
+    - condition: ${location_string =! null || location_string != "null"}
+      next: location_string_step
+
+location_string_step:
+  assign:
+    location_string: ${location_string[1].toUpperCase() + location_string.slice(1)}
+
+location_return_success:
+  return: ${"Rahvaarv aastal " + year + " asukohas " + location_string + " oli " + result.response.body.value + "."}
+  next: end
+
+general_return_success:
+  return: ${"Rahvaarv aastal " + year + " üle kogu Eesti oli " + result.response.body.value + "."}
+  next: end
+
+fail_step:
+  assign:
+    result: undefined
+    location_string: null
+  return: null
+  status: 300
