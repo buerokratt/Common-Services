@@ -1,0 +1,40 @@
+checkService:
+  switch:
+    - condition: ${incoming.body.list[0] === "#datetime"}
+      next: assignLocation
+  next: noService
+
+assignLocation:
+  assign:
+    location: ${incoming.body.list[1]}
+    next: getTimeFromAPI
+
+getTimeFromAPI:
+  call: http.get
+  args:
+    url: "http://worldtimeapi.org/api/timezone/Europe/${location}"
+  result: dateTimeObject
+  error: returnError
+  next: assignDateTime
+
+assignDateTime:
+  assign:
+    date: ${dateTimeObject.response.body.datetime.substr(0, 10)}
+    time: ${dateTimeObject.response.body.datetime.substr(11, 8)}
+  next: returnTime
+
+returnTime:
+  return: ${"Asukohas " + location + " on kuupäev " + date + " ja kell on " + time + "."}
+  next: end
+
+returnError:
+  return: "Error: failed to get the datetime."
+  next: end
+
+noService:
+  return: "${incoming.body.list[0]} , POLE TEENUST"
+  status: 400
+  next: end
+
+#For testing:
+#curl -X POST -H "Content-Type: application/json" -d '{"list": ["#datetime", "Tallinn"]}' http://localhost:8080/time
