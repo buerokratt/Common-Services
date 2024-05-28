@@ -7,12 +7,13 @@ checkService:
 assignLocation:
   assign:
     location: ${incoming.body.list[1]}
-    next: getTimeFromAPI
+    region: ${incoming.body.list[2]}
+  next: getTimeFromAPI
 
 getTimeFromAPI:
   call: http.get
   args:
-    url: "http://worldtimeapi.org/api/timezone/Europe/${location}"
+    url: "http://worldtimeapi.org/api/timezone/${region}/${location}"
   result: dateTimeObject
   error: returnError
   next: assignDateTime
@@ -36,5 +37,6 @@ noService:
   status: 400
   next: end
 
-#For testing:
-#curl -X POST -H "Content-Type: application/json" -d '{"list": ["#datetime", "Tallinn"]}' http://localhost:8080/time
+# For testing:
+# curl -X POST -H "Content-Type: application/json" -d '{"list": ["#datetime", "Tallinn", "Europe"]}' http://localhost:8080/time
+# curl -X POST -H "Content-Type: application/json" -d '{"list": ["#datetime", "Tokyo", "Asia"]}' http://localhost:8080/time
