@@ -49,7 +49,7 @@ curl localhost:8080/calendar/national-holidays/today
 #### Expected outcome - if no national holiday today
 ```
 {
-    "response": []
+  "response": null
 }
 ```
 
