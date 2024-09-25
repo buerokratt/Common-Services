@@ -25,6 +25,7 @@ curl localhost:8080/calendar/national-holidays
 }
 ```
 
+
 ### Validate if it's a national holiday today
 
 #### Endpoint
@@ -45,6 +46,14 @@ curl localhost:8080/calendar/national-holidays/today
 }
 ```
 
+#### Expected outcome - if no national holiday today
+```
+{
+    "response": []
+}
+```
+
+
 ### Provide the previous national holiday
 
 #### Endpoint
@@ -52,7 +61,7 @@ curl localhost:8080/calendar/national-holidays/today
 
 #### Sample query
 ```
-curl -X localhost:8080/calendar/national-holidays/previous
+curl localhost:8080/calendar/national-holidays/previous
 ```
 
 #### Expected outcome
@@ -64,6 +73,7 @@ curl -X localhost:8080/calendar/national-holidays/previous
     }
 }
 ```
+
 
 ### Provide the next national holiday
 
@@ -85,6 +95,7 @@ curl localhost:8080/calendar/national-holidays/next
 }
 ```
 
+
 ### List all national holidays existed this given year until now (including)
 
 #### Endpoint  
@@ -95,7 +106,7 @@ curl localhost:8080/calendar/national-holidays/next
 curl localhost:8080/calendar/national-holidays/ytd
 ```
 
-####Expected outcome - if current date e.g. "2024-09-24"
+#### Expected outcome - if current date e.g. "2024-09-24"
 ```
 {
     "response": [
@@ -111,6 +122,7 @@ curl localhost:8080/calendar/national-holidays/ytd
     ]
 }
 ```
+
 
 ### List all national holidays from today (including) until the end of given year
 
@@ -139,9 +151,10 @@ curl localhost:8080/calendar/national-holidays/eoy
 }
 ```
 
+
 ### List all national holidays based on input text
 
-####Endpoint - accepts holiday name as parameter**  
+#### Endpoint - accepts holiday name as parameter**  
 `/calendar/national-holidays/find/by-name`
 
 #### Sample query
@@ -161,14 +174,15 @@ curl localhost:8080/calendar/national-holidays/by-name?name=uusaasta
 }
 ```
 
+
 ### List all national holidays based on month
 
-####Endpoint - accepts holiday month as parameter 
+#### Endpoint - accepts holiday month as parameter 
 `/calendar/national-holidays/find/by-month`
 
 #### Sample query
 ```
-curl /calendar/national-holidays/find/by-month?month=5
+curl localhost:8080/calendar/national-holidays/find/by-month?month=5
 ```
 
 #### Expected outcome - if number input/passed parameter is 5
