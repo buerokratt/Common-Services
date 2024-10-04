@@ -25,7 +25,6 @@ curl localhost:8080/calendar/national-holidays
 }
 ```
 
-
 ### Validate if it's a national holiday today
 
 #### Endpoint
