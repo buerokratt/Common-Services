@@ -1,3 +1,13 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "Find Previous Holiday"
+  description: |
+    This service returns the most recent national holiday before today's date, using a mock API response of public holidays in 2024.
+  method: get
+  params: []
+  returns: json
+
 prepare:
   assign:
     today: ${new Date().toISOString().split("T")[0]}
@@ -24,7 +34,7 @@ makeApiCall:
         - date: "2024-06-23"
           name: "võidupüha"
         - date: "2024-06-24"
-          name: "jaanipäev"
+          name: "jaanipäev" 
         - date: "2024-08-20"
           name: "taasiseseisvumispäev"
         - date: "2024-12-24"
@@ -40,85 +50,5 @@ validateHoliday:
     previousHoliday: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}  
 
-# formatMessage:
-#   assign:
-#     date: ${previousHoliday.date}
-#     name: ${previousHoliday.name}
-#     message: "Eelmine riigipüha oli ${date} - ${name}"
-
 returnValue:
   return: ${previousHoliday}
-
-# #--- Riiklikud tähtpäevad 2024 ---
-        # - date: "2024-01-06"
-        #   name: "kolmekuningapäev"
-        # - date: "2024-01-30"
-        #   name: "eesti kirjanduse päev"
-        # - date: "2024-02-02"
-        #   name: "Tartu rahulepingu aastapäev"
-        # - date: "2024-03-14"
-        #   name: "emakeelepäev"
-        # - date: "2024-05-12"
-        #   name: "emadepäev"
-        # - date: "2024-06-01"
-        #   name: "lastekaitsepäev"
-        # - date: "2024-06-04"
-        #   name: "Eesti lipu päev"
-        # - date: "2024-06-14"
-        #   name: "leinapäev"
-        # - date: "2024-08-23"
-        #   name: "kommunismi ja natsismi ohvrite mälestuspäev"
-        # - date: "2024-09-08"
-        #   name: "vanavanemate päev"
-        # - date: "2024-09-22"
-        #   name: "vastupanuvõitluse päev"
-        # - date: "2024-10-01"
-        #   name: "omavalitsuspäev"
-        # - date: "2024-10-19"
-        #   name: "hõimupäev"
-        # - date: "2024-11-02"
-        #   name: "hingedepäev"
-        # - date: "2024-11-10"
-        #   name: "isadepäev"
-        # - date: "2024-11-16"
-        #   name: "taassünni päev"
-
-        # #--- Eesti lipupäevad 2024 ---
-        # - date: "2024-01-03"
-        #   name: "Vabadussõjas võidelnute mälestuspäev"
-        # - date: "2024-01-30"
-        #   name: "eesti kirjanduse päev"
-        # - date: "2024-02-02"
-        #   name: "Tartu rahulepingu aastapäev"
-        # - date: "2024-02-24"
-        #   name: "iseseisvuspäev, Eesti Vabariigi aastapäev"
-        # - date: "2024-03-14"
-        #   name: "emakeelepäev"
-        # - date: "2024-04-23"
-        #   name: "veteranipäev"
-        # - date: "2024-05-09"
-        #   name: "Euroopa päev"
-        # - date: "2024-05-12"
-        #   name: "emadepäev"
-        # - date: "2024-06-01"
-        #   name: "lastekaitsepäev"
-        # - date: "2024-06-04"
-        #   name: "Eesti lipu päev"
-        # - date: "2024-06-09"
-        #   name: "Euroopa Parlamendi valimise päev"
-        # - date: "2024-06-14"
-        #   name: "leinapäev (lipp heisatakse leinalipuna)"
-        # - date: "2024-06-23"
-        #   name: "võidupüha"
-        # - date: "2024-06-24"
-        #   name: "jaanipäev"
-        # - date: "2024-08-20"
-        #   name: "taasiseseisvumispäev"
-        # - date: "2024-09-01"
-        #   name: "teadmistepäev"
-        # - date: "2024-09-08"
-        #   name: "vanavanemate päev"
-        # - date: "2024-10-19"
-        #   name: "hõimupäev"
-        # - date: "2024-11-10"
-        #   name: "isadepäev"
