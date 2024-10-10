@@ -3,7 +3,7 @@ declaration:
   version: 0.1
   name: "Filter Holidays Year-to-Date"
   description: |
-    This service filters the holidays for the current year-to-date from a mocked API response.
+    This service filters  holidays for the current year-to-date from a mocked API response.
   method: get
   params: []
   returns: json
