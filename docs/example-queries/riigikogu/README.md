@@ -1,0 +1,1 @@
+## to get information about members participation statistics
