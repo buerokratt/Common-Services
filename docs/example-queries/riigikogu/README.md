@@ -4,8 +4,8 @@
 
 **Endpoint**
 ```
-/services/mock/member-participation
-/services/member-participation
+localhost:8080/riigikogu/mock/member-participation
+localhost:8080/riigikogu/member-participation
 ```
 
 **Accepts parameters**
@@ -31,3 +31,30 @@ curl "localhost:8080/services/member-participation?memberName=Jüri%20Ratas&star
     "response": "Jüri Ratas on olnud perioodil 2024-09-01 - 2024-09-30 kohal 20 korda ja puudunud 5 korda."
 }
 ```
+
+## Get the latest voting results from Riigikogu
+
+**Endpoint**
+```
+/services/votings/latest
+/services/votings/latest
+```
+
+**Description**
+This service retrieves the most recent voting results from Riigikogu. It provides the title of the voting along with details about how many members voted in favor, against, were neutral, or abstained.
+
+**Sample Query**
+```
+curl "localhost:8080/services/votings/latest"
+```
+
+**Expected outcome**
+```
+# If the latest voting data is successfully retrieved
+
+{
+    "response": "'Eelnõu X', Poolt on 50, Vastu on 30, Neutraalsed 10, Ei hääletanud 5"
+}
+```
+
+
