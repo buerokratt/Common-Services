@@ -1,0 +1,10 @@
+# Service Declaration
+declaration:
+  call: declare
+  version: 0.1
+  name: MOCK Member Participation Statistics Service
+  description: A MOCK service that provides participation statistics for Riigikogu members.
+  method: get
+  returns: json
+  namespace: common-services
+
