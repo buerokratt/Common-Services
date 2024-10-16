@@ -1,3 +1,11 @@
+declaration:
+  name: "Holiday Filter by Month"
+  description: "Fetches and filters Estonian national holidays for a specified month in 2024."
+  parameters:
+    - month: "The month (1-12) for which to retrieve holidays."
+  method: "get"
+  return: "json"
+
 prepare:
   assign:
     searchTerm: "${incoming.params.month}"
