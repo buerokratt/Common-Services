@@ -52,5 +52,12 @@ validateHolidaysEOY:
         .filter(holiday => holiday.date >= today && holiday.date <= yearEnd)
         .sort((a, b) => new Date(a.date) - new Date(b.date))}
 
+
+# formatMessage:
+#   assign:
+#     holidaysList: ${holidaysEOY.map(holiday => holiday.date + " - " + holiday.name).join(", ")}
+#     message: "Riigipühad alates tänasest kuni aasta lõpuni(k.a): ${holidaysList}"
+
+
 returnValue:
   return: ${holidaysEOY}

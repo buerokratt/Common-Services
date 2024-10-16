@@ -53,5 +53,10 @@ filterHolidaysByName:
   assign:
     filteredHolidays: ${holidayData.response.body.holidays.filter(holiday => holiday.name.toLowerCase().includes(searchTerm.toLowerCase()))}
 
+# formatMessage:
+#   assign:
+#     holidaysList: ${filteredHolidays.map(holiday => holiday.date + " - " + holiday.name).join(", ")}
+#     message: "Leitud riigipühad: ${holidaysList.length > 0 ? holidaysList : 'Ühtegi riigipüha ei leitud.'}"
+
 returnValue:
   return: ${filteredHolidays}

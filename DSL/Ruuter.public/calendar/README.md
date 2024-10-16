@@ -5,13 +5,11 @@
 `/calendar/national-holidays`
 
 **Sample query**
-
 ```
 curl localhost:8080/calendar/national-holidays
 ```
 
 **Expected outcome**
-
 ```
 {
     "response": [
@@ -33,7 +31,6 @@ curl localhost:8080/calendar/national-holidays
 `/calendar/national-holidays/today`
 
 **Sample query**
-
 ```
 curl localhost:8080/calendar/national-holidays/today
 ```
@@ -72,7 +69,6 @@ curl -X localhost:8080/calendar/national-holidays/previous
 `/calendar/national-holidays/next`
 
 **Sample query**
-
 ```
 curl localhost:8080/calendar/national-holidays/next
 ```
