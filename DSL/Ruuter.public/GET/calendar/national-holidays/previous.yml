@@ -48,7 +48,7 @@ makeApiCall:
 validateHoliday:
   assign:
     previousHoliday: ${holiday_data.response.body.holidays
-        .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}  
+        .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}
 
 returnValue:
-  return: ${previousHoliday}
+  return: "Viimane riigipüha oli ${previousHoliday.name} - ${previousHoliday.date}"

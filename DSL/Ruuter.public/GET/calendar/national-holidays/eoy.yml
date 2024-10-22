@@ -12,6 +12,7 @@ prepare:
   assign:
     today: ${new Date().toISOString().split("T")[0]}
     yearEnd: ${today.split("-")[0] + "-12-31"}
+  next: makeApiCall
 
 makeApiCall:
   call: reflect.mock
@@ -45,19 +46,16 @@ makeApiCall:
         - date: "2024-12-26"
           name: "teine jõulupüha"
   result: holiday_data
+  next: validateHolidaysEOY
 
 validateHolidaysEOY:
   assign:
     holidaysEOY: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date >= today && holiday.date <= yearEnd)
         .sort((a, b) => new Date(a.date) - new Date(b.date))}
+  next: returnValue
 
-
-# formatMessage:
-#   assign:
-#     holidaysList: ${holidaysEOY.map(holiday => holiday.date + " - " + holiday.name).join(", ")}
-#     message: "Riigipühad alates tänasest kuni aasta lõpuni(k.a): ${holidaysList}"
-
+# Have to ad DMAPPER
 
 returnValue:
   return: ${holidaysEOY}

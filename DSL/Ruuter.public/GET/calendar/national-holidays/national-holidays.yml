@@ -40,6 +40,9 @@ makeApiCall:
         - date: "2024-12-26"
           name: "teine jõulupüha"
   result: holidayData
+  next: returnValue
+
+# Have to ad DMAPPER
 
 returnValue:
   return: ${holidayData.response.body.holidays}

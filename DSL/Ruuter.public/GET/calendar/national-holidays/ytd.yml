@@ -12,6 +12,7 @@ prepare:
   assign:
     today: ${new Date().toISOString().split("T")[0]}
     yearStart: ${today.split("-")[0] + "-01-01"}
+  next: makeApiCall
 
 makeApiCall:
   call: reflect.mock
@@ -45,12 +46,26 @@ makeApiCall:
         - date: "2024-12-26"
           name: "teine jõulupüha"
   result: holiday_data
+  next: validateHolidaysYTD
 
 validateHolidaysYTD:
   assign:
     holidaysYTD: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date >= yearStart && holiday.date <= today)
         .sort((a, b) => new Date(a.date) - new Date(b.date))}
+  next: returnValue
+
+# Have to ad DMAPPER
+
+map_result_to_dm:
+  requestType: post
+  template: "DMapper/hbs/calendar/national-holidays/search"
+  body:
+    response: ${get_result}
+    tag: ${set_tag}
+  result: mapped_result
+  next: log_step
 
 returnValue:
   return: ${holidaysYTD}
+  next: end
