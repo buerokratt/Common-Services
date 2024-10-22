@@ -5,7 +5,6 @@ declaration:
   description: |
     This service filters  holidays for the current year-to-date from a mocked API response.
   method: get
-  params: []
   returns: json
 
 prepare:
@@ -45,27 +44,24 @@ makeApiCall:
           name: "esimene jõulupüha"
         - date: "2024-12-26"
           name: "teine jõulupüha"
-  result: holiday_data
+  result: holidayData
   next: validateHolidaysYTD
 
 validateHolidaysYTD:
   assign:
-    holidaysYTD: ${holiday_data.response.body.holidays
+    holidaysYTD: ${holidayData.response.body.holidays
         .filter(holiday => holiday.date >= yearStart && holiday.date <= today)
         .sort((a, b) => new Date(a.date) - new Date(b.date))}
+  next: formatResult
+
+formatResult:
+  requestType: post
+  template: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_ytd"
+  body:
+    holidaysYTD: ${holidaysYTD}
+  result: formattedHolidays
   next: returnValue
 
-# Have to ad DMAPPER
-
-map_result_to_dm:
-  requestType: post
-  template: "DMapper/hbs/calendar/national-holidays/search"
-  body:
-    response: ${get_result}
-    tag: ${set_tag}
-  result: mapped_result
-  next: log_step
-
 returnValue:
-  return: ${holidaysYTD}
+  return: ${formattedHolidays}
   next: end
