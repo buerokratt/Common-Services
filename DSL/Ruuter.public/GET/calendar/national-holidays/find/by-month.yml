@@ -91,5 +91,3 @@ holidayNotFound:
 returnNoHolidays:
   return: ${noHoliday}
   next: end
-
-

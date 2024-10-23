@@ -54,7 +54,7 @@ curl -X localhost:8080/calendar/national-holidays/previous
 
 ## Provide the next national holiday
 **Endpoint**  
-`/calendar/national-holidays/next`
+`/calendar/national-holidays/next`<<<<<<< 60-rest-endpoint-to-retrieve-national-holidays-in-estonia
 
 **Sample query**
 ```
@@ -65,6 +65,7 @@ curl localhost:8080/calendar/national-holidays/next
 ```
 {
     "response": {
+
         "result": "Tulev riigipüha on jõululaupäev - 2024-12-24"
     }
 }
