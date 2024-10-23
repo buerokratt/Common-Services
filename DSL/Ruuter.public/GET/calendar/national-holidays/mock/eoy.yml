@@ -1,16 +1,17 @@
 declaration:
   call: declare
   version: 0.1
-  name: "Find Previous Holiday"
+  name: "MOCK - Find Holidays Until End of Year"
   description: |
-    This service returns the most recent national holiday before today's date, using a mock API response of public holidays in 2024.
+    This mock service returns all holidays from today's date until the end of the year, based on a mock API response of 2024 public holidays.
   method: get
   params: []
   returns: json
 
 prepare:
   assign:
-    today: ${new Date().toISOString().split("T")[0]}
+    today: "2024-10-10" #${new Date().toISOString().split("T")[0]}
+    yearEnd: ${today.split("-")[0] + "-12-31"}
   next: makeApiCall
 
 makeApiCall:
@@ -35,7 +36,7 @@ makeApiCall:
         - date: "2024-06-23"
           name: "võidupüha"
         - date: "2024-06-24"
-          name: "jaanipäev" 
+          name: "jaanipäev"
         - date: "2024-08-20"
           name: "taasiseseisvumispäev"
         - date: "2024-12-24"
@@ -45,20 +46,24 @@ makeApiCall:
         - date: "2024-12-26"
           name: "teine jõulupüha"
   result: holiday_data
-  next: validateHoliday
+  next: validateHolidaysEOY
 
-validateHoliday:
+validateHolidaysEOY:
   assign:
-    previousHoliday: ${holiday_data.response.body.holidays
-        .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}
-  next: formatValue
+    holidaysEOY: ${holiday_data.response.body.holidays
+        .filter(holiday => holiday.date >= today && holiday.date <= yearEnd)
+        .sort((a, b) => new Date(a.date) - new Date(b.date))}
+  next: formatResult
 
-formatValue:
-  assign:
-    previousHoliday:
-      result: "Viimane riigipüha oli ${previousHoliday.name} - ${previousHoliday.date}"
+formatResult:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_eoy"
+    response:
+      result: "Kõik riigipühad alates tänsest kuni aasta lõpuni on: \n*2024-12-24\n jõululaupäev\n\n *2024-12-25\n esimene jõulupüha\n\n *2024-12-26\n teine jõulupüha\n\n"
+  result: formattedHolidays
   next: returnValue
 
 returnValue:
-  return: "${previousHoliday}"
+  return: ${formattedHolidays.response.body}
   next: end

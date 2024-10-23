@@ -1,25 +1,25 @@
 declaration:
   call: declare
   version: 0.1
-  name: "Holiday Search Service"
-  description: "Searches for a national holiday by name in the 2024 calendar"
+  name: "MOCK - Check Today's Holiday"
+  description: |
+    This mock service checks if today is a national holiday based on a mocked API response.
   method: get
+  params: []
   returns: json
 
 prepare:
-  # Assign incoming 'name' parameter to 'searchTerm'
   assign:
-    searchTerm: "${incoming.params.name || 'uusaasta'}"
+    today: "2024-01-01" # ${new Date().toISOString().split("T")[0]}
   next: makeApiCall
 
 makeApiCall:
-  # Mock API call returning 2024 holidays
   call: reflect.mock
   args:
     url: "www.example.com"
     response: 
       holidays:
-        # List of holidays
+        # --- Riigipühad ja puhkepäevad 2024 ---
         - date: "2024-01-01"
           name: "uusaasta"
         - date: "2024-02-24"
@@ -45,41 +45,35 @@ makeApiCall:
         - date: "2024-12-26"
           name: "teine jõulupüha"
   result: holidayData
-  next: filterHolidaysByName
+  next: validateHoliday
 
-filterHolidaysByName:
-  # Filter holidays by 'searchTerm'
+validateHoliday:
   assign:
-    filteredHolidays: ${holidayData.response.body.holidays.filter(holiday => holiday.name.toLowerCase().includes(searchTerm.toLowerCase()))}
+    holiday: ${holidayData.response.body.holidays.find(holiday => holiday.date === today)}
   next: checkHoliday
 
 checkHoliday:
-  # Check if no holidays match
   switch:
-    - condition: ${filteredHolidays.length < 1}
+    - condition: ${!holiday}
       next: holidayNotFound
   next: formatValue
 
 formatValue:
-  # Capitalize and format result
   assign:
     holiday:
-      result: "${filteredHolidays[0].name.charAt(0).toUpperCase() + filteredHolidays[0].name.slice(1)} on ${filteredHolidays[0].date}"
+      result: "Täna on ${holiday.name}"
   next: returnValue
 
 returnValue:
-  # Return holiday result
   return: ${holiday}
   next: end
-
+# -------------------------------------------------- 
 holidayNotFound:
-  # Default message if no holiday found
   assign:
     noHoliday:
-      result: "Ei leia sellist riigipüha"
-  next: returnNoValue 
+      result: "Täna ei ole riigpüha."
+  next: returnNoValue
 
 returnNoValue:
-  # Return no-holiday message
   return: ${noHoliday}
   next: end

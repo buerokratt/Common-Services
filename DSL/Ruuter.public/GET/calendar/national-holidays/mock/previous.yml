@@ -1,16 +1,16 @@
 declaration:
   call: declare
   version: 0.1
-  name: "Find Previous Holiday"
+  name: "MOCK - Find Previous Holiday"
   description: |
-    This service returns the most recent national holiday before today's date, using a mock API response of public holidays in 2024.
+    This mock service returns the most recent national holiday before today's date, using a mock API response of public holidays in 2024.
   method: get
   params: []
   returns: json
 
 prepare:
   assign:
-    today: ${new Date().toISOString().split("T")[0]}
+    today: "2024-02-24" #${new Date().toISOString().split("T")[0]}
   next: makeApiCall
 
 makeApiCall:

@@ -1,7 +1,7 @@
 declaration:
   call: declare
   version: 0.1
-  name: "Holiday Search Service"
+  name: "MOCK - Holiday Search Service"
   description: "Searches for a national holiday by name in the 2024 calendar"
   method: get
   returns: json
@@ -9,7 +9,7 @@ declaration:
 prepare:
   # Assign incoming 'name' parameter to 'searchTerm'
   assign:
-    searchTerm: "${incoming.params.name || 'uusaasta'}"
+    searchTerm: "${incoming.params.name || 'uusaasta'}" # default to 'uusaasta'
   next: makeApiCall
 
 makeApiCall:
