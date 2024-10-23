@@ -89,5 +89,7 @@ holidayNotFound:
   next: returnNoHolidays
 
 returnNoHolidays:
-  return: ${noHoliday.result}
+  return: ${noHoliday}
   next: end
+
+

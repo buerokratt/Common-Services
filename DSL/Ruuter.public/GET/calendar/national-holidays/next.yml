@@ -51,7 +51,13 @@ validateHoliday:
   assign:
     upcomingHoliday: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date >= today).sort((a, b) => new Date(a.date) - new Date(b.date))[0]}
+  next: formatValue
+
+formatValue:
+  assign:
+    upcomingHoliday:
+      result: "Tulev riigipüha on ${upcomingHoliday.name} - ${upcomingHoliday.date}"
   next: returnValue
 
 returnValue:
-  return: "Tulev riigipüha on ${upcomingHoliday.name} - ${upcomingHoliday.date}"
+  return: "${upcomingHoliday}"

@@ -52,6 +52,7 @@ formatResult:
 
 returnValue:
   return: ${formattedHolidays}
+  next: end
 
         # # --- Riiklikud tähtpäevad 2024 ---
         # - date: "2024-01-06"
