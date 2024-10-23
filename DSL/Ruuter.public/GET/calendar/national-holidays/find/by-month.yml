@@ -66,12 +66,13 @@ assignValue:
   next: returnValue
 
 formatValue:
-  requestType: post
-  template: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_by_month"
-  body:
-    filteredHolidays: ${filteredHolidays}
+  call: http.post
+  args:
+    url: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_by_month"
+    body:
+      data: ${filteredHolidays}
   result: holiday
-  next: returnDMValue
+  next: returnValue
 
 returnValue:
   return: ${holiday.result}

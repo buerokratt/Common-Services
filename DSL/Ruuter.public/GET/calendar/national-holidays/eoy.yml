@@ -45,21 +45,22 @@ makeApiCall:
           name: "esimene jõulupüha"
         - date: "2024-12-26"
           name: "teine jõulupüha"
-  result: holiday_data
+  result: holidayData
   next: validateHolidaysEOY
 
 validateHolidaysEOY:
   assign:
-    holidaysEOY: ${holiday_data.response.body.holidays
+    holidaysEOY: ${holidayData.response.body.holidays
         .filter(holiday => holiday.date >= today && holiday.date <= yearEnd)
         .sort((a, b) => new Date(a.date) - new Date(b.date))}
   next: formatResult
 
 formatResult:
-  requestType: post
-  template: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_eoy"
-  body:
-    holidaysEOY: ${holidaysEOY}
+  call: http.post
+  args:
+    url: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_eoy"
+    body:
+      data: ${holidaysEOY}
   result: formattedHolidays
   next: returnValue
 

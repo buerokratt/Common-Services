@@ -43,10 +43,11 @@ makeApiCall:
   next: formatResult
 
 formatResult:
-  requestType: post
-  template: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holidays"
-  body:
-    holidaysEOY: ${holidayData.response.body.holidays}
+  call: http.post
+  args:
+    url: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holidays"
+    body:
+      data: ${holidayData.response.body.holidays}
   result: formattedHolidays
   next: returnValue
 

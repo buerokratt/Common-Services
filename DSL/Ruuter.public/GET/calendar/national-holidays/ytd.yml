@@ -56,10 +56,11 @@ validateHolidaysYTD:
   next: formatResult
 
 formatResult:
-  requestType: post
-  template: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_ytd"
-  body:
-    holidaysYTD: ${holidaysYTD}
+  call: http.post
+  args:
+    url: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_ytd"
+    body:
+      data: ${holidaysYTD}
   result: formattedHolidays
   next: returnValue
 
