@@ -57,7 +57,7 @@ assign_response:
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
     headers:
       type: json
     body:

@@ -120,7 +120,7 @@ getAll:
 mapAllData:
   call: http.post
   args:
-    url: "[#DMAPPER]/hbs/common-services/get_total"
+    url: "[#DMAPPER]/common-services/hbs/get_total"
     headers:
       type: "json"
     body:
@@ -136,7 +136,7 @@ assign_response:
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
     headers:
       type: json
     body:

@@ -57,7 +57,7 @@ assign_response:
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-contact-information-for-business-register"
+    url: "[#DMAPPER]/common-services/hbs/filter-contact-information-for-business-register"
     headers:
       type: json
     body:

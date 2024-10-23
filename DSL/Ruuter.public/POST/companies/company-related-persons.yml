@@ -49,7 +49,7 @@ assign_response:
 format_messages:
   call: http.post
   args:
-    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-company-related-persons"
+    url: "[#DMAPPER]/common-services/hbs/filter-company-related-persons"
     headers:
       type: json
     body:
