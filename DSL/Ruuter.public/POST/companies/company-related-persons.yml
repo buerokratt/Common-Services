@@ -15,12 +15,18 @@ declaration:
         type: string
         description: "Registry code of the requested company"
 
+extract_body:
+  assign:
+    message: ${incoming.body.message}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+
 getRelatedPersons:
   call: http.post
   args:
     url: "[#XTR]/ar/ettevottegaSeotudIsikud_v1"
     body:
-      reg_code: "${incoming.body.message}"
+      reg_code: "${message}"
   result: relatedPersons
   next: mapRelatedPersons
 
@@ -33,8 +39,31 @@ mapRelatedPersons:
     body:
       keha: ${relatedPersons.response.body.ettevottegaSeotudIsikud_v1Response.keha}
   result: mappedRelatedPersons
-  next: returnRelatedPersons
+  next: assign_response
 
-returnRelatedPersons:
-  return: ${mappedRelatedPersons.response.body}
-  next: end
+assign_response:
+  assign:
+    res: ${mappedRelatedPersons.response.body}
+  next: format_messages
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/filter-company-related-persons"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatted_messages_res
+
+return_result:
+  return: ${formatted_messages_res.response.body}

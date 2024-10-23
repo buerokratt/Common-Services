@@ -19,15 +19,18 @@ declaration:
         type: string
         description: "Cookie field"
 
-assign_values:
+extract_body:
   assign:
-    params: ${incoming.body}
+    message: ${incoming.body.message}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+    county: ${incoming.body.county}
 
 checkForParams:
   switch:
-    - condition: ${params.message != null}
+    - condition: ${message != null}
       next: getWithCode
-    - condition: ${params.county != null}
+    - condition: ${county != null}
       next: getWithCounty
   next: getAll
 
@@ -37,7 +40,7 @@ getWithCode:
     url: "[#OPENSEARCH]/companies/_search/template"
     body:
       id: "company-with-code"
-      params: { registry_code: "${params.message}", field: "labor_taxes_and_payments" }
+      params: { registry_code: "${message}", field: "labor_taxes_and_payments" }
   result: res
   next: mapCodeData
 
@@ -72,7 +75,7 @@ getWithCounty:
     url: "[#OPENSEARCH]/companies/_search/template"
     body:
       id: "companies-with-county"
-      params: { county: "${params.county}", field: "labor_taxes_and_payments" }
+      params: { county: "${county}", field: "labor_taxes_and_payments" }
   result: res
   next: mapCountyData
 
@@ -110,8 +113,31 @@ mapAllData:
     body:
       aggregations: ${res.response.body.aggregations}
   result: allMappedData
-  next: return_all_result
+  next: assign_response
 
-return_all_result:
-  return: ${allMappedData.response.body}
-  next: end
+assign_response:
+  assign:
+    res: ${allMappedData.response.body}
+  next: format_messages
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatted_messages_res
+
+return_result:
+  return: ${formatted_messages_res.response.body}

@@ -21,12 +21,18 @@ declaration:
         type: string
         description: "X-Road API password"
 
+extract_body:
+  assign:
+    message: ${incoming.body.message}
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+
 getSimpleCompanyData:
   call: http.post
   args:
     url: "[#XTR]/ar/lihtandmed_v3"
     body:
-      reg_code: "${incoming.body.message}" 
+      reg_code: "${message}" 
       username: "[#XTR_AR_USERNAME]" 
       password: "[#XTR_AR_PASSWORD]"
   result: simpleCompanyData
@@ -41,8 +47,31 @@ mapSimpleCompanyData:
     body:
       keha: ${simpleCompanyData.response.body.lihtandmed_v3Response.keha.ettevotjad.item}
   result: mappedSimpleCompanyData
-  next: returnSimpleCompanyData
+  next: assign_response
 
-returnSimpleCompanyData:
-  return: ${mappedSimpleCompanyData.response.body}
-  next: end
+assign_response:
+  assign:
+    res: ${mappedSimpleCompanyData.response.body}
+  next: format_messages
+
+format_messages:
+  call: http.post
+  args:
+    url: "[#CHATBOT_DMAPPER]/hbs/chat-bot/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatted_messages_res
+
+return_result:
+  return: ${formatted_messages_res.response.body}
