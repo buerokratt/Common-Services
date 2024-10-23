@@ -56,12 +56,18 @@ checkHoliday:
   switch:
     - condition: ${!holiday}
       next: holidayNotFound
+  next: formatValue
+
+formatValue:
+  assign:
+    holiday:
+      result: "Täna on ${holiday.name}"
   next: returnValue
 
 returnValue:
-  return: "Täna on ${holiday.name}"
+  return: ${holiday}
   next: end
-
+# -------------------------------------------------- 
 holidayNotFound:
   assign:
     noHoliday:
