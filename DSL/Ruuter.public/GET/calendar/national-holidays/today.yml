@@ -58,6 +58,10 @@ checkHoliday:
       next: holidayNotFound
   next: returnValue
 
+returnValue:
+  return: "Täna on ${holiday.name}"
+  next: end
+
 holidayNotFound:
   assign:
     noHoliday:
@@ -66,8 +70,4 @@ holidayNotFound:
 
 returnNoValue:
   return: ${noHoliday}
-  next: end
-
-returnValue:
-  return: "Täna on ${holiday.name}"
   next: end

@@ -45,12 +45,12 @@ makeApiCall:
           name: "esimene jõulupüha"
         - date: "2024-12-26"
           name: "teine jõulupüha"
-  result: holidayData
+  result: holiday_data
   next: validateHolidaysEOY
 
 validateHolidaysEOY:
   assign:
-    holidaysEOY: ${holidayData.response.body.holidays
+    holidaysEOY: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date >= today && holiday.date <= yearEnd)
         .sort((a, b) => new Date(a.date) - new Date(b.date))}
   next: formatResult
@@ -65,3 +65,4 @@ formatResult:
 
 returnValue:
   return: ${formattedHolidays}
+  next: end

@@ -11,6 +11,7 @@ declaration:
 prepare:
   assign:
     today: ${new Date().toISOString().split("T")[0]}
+  next: makeApiCall
 
 makeApiCall:
   call: reflect.mock
@@ -44,11 +45,14 @@ makeApiCall:
         - date: "2024-12-26"
           name: "teine jõulupüha"
   result: holiday_data
+  next: validateHoliday
 
 validateHoliday:
   assign:
     previousHoliday: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}
+  next: returnValue
 
 returnValue:
   return: "Viimane riigipüha oli ${previousHoliday.name} - ${previousHoliday.date}"
+  next: end

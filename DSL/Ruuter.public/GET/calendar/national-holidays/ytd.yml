@@ -5,6 +5,7 @@ declaration:
   description: |
     This service filters  holidays for the current year-to-date from a mocked API response.
   method: get
+  params: []
   returns: json
 
 prepare:
