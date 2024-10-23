@@ -51,8 +51,14 @@ validateHoliday:
   assign:
     previousHoliday: ${holiday_data.response.body.holidays
         .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}
+  next: formatValue
+
+formatValue:
+  assign:
+    previousHoliday:
+      result: "Viimane riigipüha oli ${previousHoliday.name} - ${previousHoliday.date}"
   next: returnValue
 
 returnValue:
-  return: "Viimane riigipüha oli ${previousHoliday.name} - ${previousHoliday.date}"
+  return: "${previousHoliday}"
   next: end
