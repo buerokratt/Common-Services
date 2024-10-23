@@ -54,32 +54,54 @@ checkHolidays:
   switch:
     - condition: ${filteredHolidays.length < 1}
       next: holidayNotFound
+    - condition: ${filteredHolidays.length === 1}
+      next: assignSingleValue
     - condition: ${filteredHolidays.length > 1}
       next: formatValue
-    - condition: ${filteredHolidays.length === 1}
-      next: assignValue
 
-assignValue:
+assignSingleValue:
   assign:
-    holiday:
+    res: 
       result: "Antud kuus on ${filteredHolidays[0].name} - ${filteredHolidays[0].date}"
-  next: returnValue
+  next: formatValue
 
 formatValue:
   call: http.post
   args:
-    url: "[#DMAPPER]/hbs/calendar/national-holidays/get_national_holiday_by_month"
+    url: "[#DMAPPER]/common-services//hbs/calendar/national-holidays/get_national_holiday_by_month"
     body:
       data: ${filteredHolidays}
   result: holiday
-  next: returnValue
+  next: assignResponse
 
-returnValue:
-  return: ${holiday.result}
-  next: end
+assignResponse:
+  assign:
+    res: ${holiday.response.body}
+  next: formatMessages
 
-returnDMValue:
-  return: ${holiday.result}
+# format throgh DM bot response to messages
+formatMessages:
+  call: http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatMessage
+  next: return_result
+
+return_result:
+  return: ${formatMessage.response.body}
   next: end
 
 #--------------------------------
