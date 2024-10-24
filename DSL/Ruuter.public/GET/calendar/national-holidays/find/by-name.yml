@@ -11,7 +11,7 @@ prepare:
   assign:
     chatId: ${incoming.body.chatId}
     authorId: ${incoming.body.authorId}
-    searchTerm: "${incoming.params.name || 'uusaasta'}"
+    searchTerm: "${incoming.body.input}"
   next: makeApiCall
 
 makeApiCall:
@@ -51,7 +51,7 @@ makeApiCall:
 
 filterHolidaysByName:
   assign:
-    filteredHolidays: ${holidayData.response.body.holidays.filter(holiday => holiday.name.toLowerCase().includes(searchTerm.toLowerCase()))}
+    filteredHolidays: ${holidayData.response.body.holidays.filter(holiday => holiday.name.toLowerCase().includes(searchTerm[0].toLowerCase()))}
   next: checkHoliday
 
 checkHoliday:
