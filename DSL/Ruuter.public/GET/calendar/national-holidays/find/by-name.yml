@@ -9,6 +9,8 @@ declaration:
 prepare:
   # Assign incoming 'name' parameter to 'searchTerm'
   assign:
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
     searchTerm: "${incoming.params.name || 'uusaasta'}"
   next: makeApiCall
 

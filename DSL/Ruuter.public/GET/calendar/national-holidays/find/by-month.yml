@@ -8,6 +8,8 @@ declaration:
 
 prepare:
   assign: # MM - month
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
     searchTerm: "${incoming.params.month || (new Date().getMonth() + 1).toString()}" # default to current month - ex."10"/MM for october 
   next: makeApiCall
 
