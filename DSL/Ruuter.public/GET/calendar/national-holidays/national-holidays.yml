@@ -56,7 +56,6 @@ assignResponse:
     res: ${formattedHolidays.response.body}
   next: formatMessages
 
-# format throgh DM bot response to messages
 formatMessages:
   call: http.post
   args:

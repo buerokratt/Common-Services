@@ -59,11 +59,15 @@ checkHolidays:
     - condition: ${filteredHolidays.length > 1}
       next: formatValue
 
+holidayNotFound:
+  assign:
+    res: "Ei leia riigipühi antud kuus"
+  next: formatMessages
+
 assignSingleValue:
   assign:
-    res: 
-      result: "Antud kuus on ${filteredHolidays[0].name} - ${filteredHolidays[0].date}"
-  next: formatValue
+    res: "Antud kuus on ${filteredHolidays[0].name} - ${filteredHolidays[0].date}"
+  next: formatMessages
 
 formatValue:
   call: http.post
@@ -102,15 +106,4 @@ formatMessages:
 
 return_result:
   return: ${formatMessage.response.body}
-  next: end
-
-#--------------------------------
-holidayNotFound:
-  assign:
-    noHoliday:
-      result: "Ei leia riigipühi antud kuus"
-  next: returnNoHolidays
-
-returnNoHolidays:
-  return: ${noHoliday}
   next: end
