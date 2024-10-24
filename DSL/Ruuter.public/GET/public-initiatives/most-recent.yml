@@ -8,6 +8,8 @@ declaration:
 
 prepareVariables:
   assign:
+    chatId: ${incoming.params.chatId}
+    authorId: ${incoming.params.authorId}
     order: "-occurredAt"
     distinct: "initiativeId"
     limit: "5"

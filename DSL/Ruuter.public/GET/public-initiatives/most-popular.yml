@@ -9,6 +9,8 @@ declaration:
 
 prepareVariables:
   assign:
+    chatId: ${incoming.params.chatId}
+    authorId: ${incoming.params.authorId}
     phase: "sign"
     signingEndsAt: "${new Date().toISOString()}"
     order: "-signatureCount"
