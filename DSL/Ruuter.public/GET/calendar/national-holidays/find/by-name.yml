@@ -1,0 +1,98 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "Holiday Search Service"
+  description: "Searches for a national holiday by name in the 2024 calendar"
+  method: get
+  returns: json
+
+prepare:
+  # Assign incoming 'name' parameter to 'searchTerm'
+  assign:
+    chatId: ${incoming.params.chatId}
+    authorId: ${incoming.params.authorId}
+    searchTerm: ${incoming.params.input.split(",")[0]}
+  next: makeApiCall
+
+makeApiCall:
+  # Mock API call returning 2024 holidays
+  call: reflect.mock
+  args:
+    url: "www.example.com"
+    response: 
+      holidays:
+        # List of holidays
+        - date: "2024-01-01"
+          name: "uusaasta"
+        - date: "2024-02-24"
+          name: "iseseisvuspäev, Eesti Vabariigi aastapäev"
+        - date: "2024-03-29"
+          name: "suur reede"
+        - date: "2024-03-31"
+          name: "ülestõusmispühade 1. püha"
+        - date: "2024-05-01"
+          name: "kevadpüha"
+        - date: "2024-05-19"
+          name: "nelipühade 1. püha"
+        - date: "2024-06-23"
+          name: "võidupüha"
+        - date: "2024-06-24"
+          name: "jaanipäev"
+        - date: "2024-08-20"
+          name: "taasiseseisvumispäev"
+        - date: "2024-12-24"
+          name: "jõululaupäev"
+        - date: "2024-12-25"
+          name: "esimene jõulupüha"
+        - date: "2024-12-26"
+          name: "teine jõulupüha"
+  result: holidayData
+  next: filterHolidaysByName
+
+filterHolidaysByName:
+  assign:
+    filteredHolidays: ${holidayData.response.body.holidays.filter(holiday => holiday.name.toLowerCase().includes(searchTerm[0].toLowerCase()))}
+  next: checkHoliday
+
+checkHoliday:
+  # Check if no holidays match
+  switch:
+    - condition: ${filteredHolidays.length < 1}
+      next: holidayNotFound
+  next: formatValue
+
+holidayNotFound:
+  assign:
+    res: {
+      "result": "Ei leia sellist riigipüha"
+    }
+  next: formatMessages 
+
+formatValue:
+  assign:
+    res: {
+      "result": "${filteredHolidays[0].name.charAt(0).toUpperCase() + filteredHolidays[0].name.slice(1)} on ${filteredHolidays[0].date}"
+    }
+  next: formatMessages
+
+formatMessages:
+  call: http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatMessage
+
+return_result:
+  return: ${formatMessage.response.body}

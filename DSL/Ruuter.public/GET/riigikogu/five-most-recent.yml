@@ -1,0 +1,71 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: " most recent voting results service"
+  description: "Provides information for 5 most-recent voting results"
+  method: get
+  returns: json
+  namespace:  common-services
+
+prepareVariables:
+  assign:
+    chatId: ${incoming.params.chatId}
+    authorId: ${incoming.params.authorId}
+    offSet: 5 # to get start date withe enough data
+    end: ${new Date().toISOString().split('T')[0]}
+    start: ${new Date(new Date(end).setDate(new Date(end).getDate() - offSet)).toISOString().split('T')[0]} 
+  next: makeAPIRequest
+
+makeAPIRequest:
+  call: http.get
+  args:
+    url: "https://api.riigikogu.ee/api/votings?endDate=${end}&lang=ET&startDate=${start}"
+    headers:
+      Accept: "application/json"
+  result: votingData
+  next: votingDataFormatting
+
+votingDataFormatting:
+  assign:
+    recentVotings: ${votingData.response.body.slice(0, 10)}
+    votingDetails: ${recentVotings.flatMap(session => session.votings)
+      .filter(voting => voting.type.value === "Avalik" && voting.relatedDraft)
+      .sort((voting1, voting2) => new Date(voting2.startDateTime) - new Date(voting1.startDateTime)).slice(0, 5)}  # Take the first 5 items
+  next: formatResult
+
+formatResult:
+  call: http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/calendar/national-holidays/get_five_most_recent"
+    body:
+      data: ${votingDetails}
+  result: formattedVotings
+  next: assignResponse
+
+assignResponse:
+  assign:
+    res: ${formattedVotings.response.body}
+  next: formatMessages
+
+# format throgh DM bot response to messages
+formatMessages:
+  call: http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatMessage
+
+return_result:
+  return: ${formatMessage.response.body}

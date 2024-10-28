@@ -1,0 +1,71 @@
+declaration:
+  call: declare
+  version: 0.1
+  description: Provides information for 5 most-popular active initiavites
+  name: "Most Popular Initiatives Service"
+  method: get
+  returns: json
+  namespace:  common-services
+
+prepareVariables:
+  assign:
+    chatId: ${incoming.params.chatId}
+    authorId: ${incoming.params.authorId}
+    phase: "sign"
+    signingEndsAt: "${new Date().toISOString()}"
+    order: "-signatureCount"
+    limit: "5"
+    rahvalagatus: "https://rahvaalgatus.ee"
+    acceptHeader: "application/vnd.rahvaalgatus.initiative+json; v=1"
+  next: getEvents
+
+getEvents:
+  call: http.get
+  args:
+    url: "${rahvalagatus}/initiatives?phase=${phase}&signingEndsAt>${signingEndsAt}&order=${order}&limit=${limit}"
+    headers:
+      Accept: "${acceptHeader}"
+  result: events
+  next: assignEvents
+
+assignEvents:
+  assign:
+    res: ${events.response.body}
+  next: formatResult
+
+formatResult:
+  call: http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/public-initatives/get_most_popular.handlebars"
+    body:
+      data: ${res}
+  result: formattedInitiatives
+  next: assignResponse
+
+assignResponse:
+  assign:
+    res: ${formattedInitiatives.response.body}
+  next: formatMessages
+
+# format throgh DM bot response to messages
+formatMessages:
+  call: http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatMessage
+
+return_result:
+  return: ${formatMessage.response.body}
