@@ -2,7 +2,7 @@ declaration:
   call: declare
   version: 0.1
   name: "Estimated Subsistence Minimum"
-  description: "Provides information about Estimated Subsistence Minimum"
+  description: "Provides Estimated Subsistence Minimum"
   method: post
   returns: json
   namespace: common-services
@@ -37,7 +37,9 @@ makeAPIRequest:
 
 assingResult:
   assign:
-    res: ${subsistence.response.body.value[0]}
+    res: {
+      "result": "Arvestuslik elatusmiinimum on ${subsistence.response.body.value[0]}€/ kuus"
+    }
   next: formatMessages
 
 formatMessages:
@@ -58,6 +60,7 @@ formatMessages:
           "created": "${new Date().toISOString()}",
         }
   result: formatMessage
-
+  next: end
+  
 return_result:
   return: ${formatMessage.response.body}
