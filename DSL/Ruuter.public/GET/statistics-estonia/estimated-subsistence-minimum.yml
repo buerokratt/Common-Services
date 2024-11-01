@@ -60,7 +60,6 @@ formatMessages:
           "created": "${new Date().toISOString()}",
         }
   result: formatMessage
-  next: end
-  
+
 return_result:
   return: ${formatMessage.response.body}
