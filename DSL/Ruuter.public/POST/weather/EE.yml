@@ -7,9 +7,6 @@ declaration:
   namespace: common-services
 
 # Assigns key variables for processing the request, including API endpoints.
-logssssss:
-   log: ${incoming.body.input[0]} 
-
 assignVariables:
   assign:
     chatId: ${incoming.body.chatId}
