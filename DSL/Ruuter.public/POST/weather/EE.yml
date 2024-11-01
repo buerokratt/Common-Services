@@ -11,7 +11,7 @@ assignVariables:
   assign:
     chatId: ${incoming.body.chatId}
     authorId: ${incoming.body.authorId}
-    region: "${incoming.body.input ? incoming.body.input[0] : 'tallinn'}"
+    region: "${incoming.body.input[0] || 'tallinn'}"
     gazeteerUrl: "https://inaadress.maaamet.ee/inaadress"
     publicapiUrl: "https://publicapi.envir.ee/v1/combinedWeatherData"
     ilmmicroserviceUrl: "https://ilmmicroservice.envir.ee/api/forecasts"
