@@ -2,11 +2,12 @@ declaration:
   call: declare
   version: 0.1
   name: "Check Today's Holiday"
-  description: |
-    This service checks if today is a national holiday based on a mocked API response.
+  description: "This service checks if today is a national holiday"
+  params:
+    - chatId: "The chat ID for the message - string"
+    - authorId: "The author ID for the message- string"
   method: get
-  params: []
-  returns: json
+  return: json
 
 prepare:
   assign:

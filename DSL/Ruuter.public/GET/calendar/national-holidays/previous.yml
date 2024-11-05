@@ -2,11 +2,12 @@ declaration:
   call: declare
   version: 0.1
   name: "Find Previous Holiday"
-  description: |
-    This service returns the most recent national holiday before today's date, using a mock API response of public holidays in 2024.
+  description: "Returns most recent national holiday before today's date"
+  params:
+    - chatId: "The chat ID for the message - string"
+    - authorId: "The author ID for the message- string"
   method: get
-  params: []
-  returns: json
+  return: json
 
 prepare:
   assign:
