@@ -2,11 +2,12 @@ declaration:
   call: declare
   version: 0.1
   name: "Find Upcoming Holiday"
-  description: |
-    This service returns the next upcoming national holiday from today's date, using a mock API response of public holidays in 2024.
+  description: "Returns the next upcoming national holiday from today's date"
+  params:
+    - chatId: "The chat ID for the message - string"
+    - authorId: "The author ID for the message- string"
   method: get
-  params: []
-  returns: json
+  return: json
 
 prepare:
   assign:
@@ -14,7 +15,6 @@ prepare:
     authorId: ${incoming.params.authorId}
     today: ${new Date(new Date().setDate(new Date().getDate() + 1)).toISOString().split("T")[0]}
   next: makeApiCall
-
 
 makeApiCall:
   call: reflect.mock
