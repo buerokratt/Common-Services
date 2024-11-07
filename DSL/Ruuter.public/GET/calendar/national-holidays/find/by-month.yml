@@ -5,8 +5,22 @@ declaration:
     - chatId: "The chat ID for the message - string"
     - authorId: "The author ID for the message- string"
     - month: "The month for which to retrieve holidays - string - ex. 'mai' or 'veebruar'"
+
   method: get
-  return: json
+  accepts: json
+  returns: json
+  namespace: common-services
+  allowlist:
+    body:
+    - field: chatId
+      type: string
+      description: "The chat ID for the message"
+    - field: authorId
+      type: string
+      description: "The author ID for the message"
+    - field: month
+      type: string
+      description: "The incoming month for which to retrieve holidays - ex. 'mai' or 'veebruar'"
 
 prepare:
   assign:

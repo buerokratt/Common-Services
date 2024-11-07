@@ -3,11 +3,20 @@ declaration:
   version: 0.1
   name: "MOCK - Check Today's Holiday"
   description: "MOCK - This service checks if today is a national holiday"
-  params:
-    - chatId: "The chat ID for the message - string"
-    - authorId: "The author ID for the message- string"
   method: get
-  return: json
+  accepts: json
+  returns: json
+  allowlist:
+    body:
+    - field: chatId
+      type: string
+      description: "The chat ID for the message"
+    - field: authorId
+      type: string
+      description: "The author ID for the message"
+    - field: today
+      type: string
+      description: "The current date in ISO format - ex. 'yyyy-mm-dd'"
 
 prepare:
   assign:

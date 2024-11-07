@@ -3,12 +3,21 @@ declaration:
   version: 0.1
   name: "MOCK - Holiday Search Service"
   description: "MOCK - Searches for a national holiday by name in the 2024 calendar"
-  params:
-    - chatId: "The chat ID for the message - string"
-    - authorId: "The author ID for the message- string"
-    - holidayName: "Holiday name for which to retrieve holidays - string - ex. 'jaanipäev'"
   method: get
-  return: json
+  accepts: json
+  returns: json
+  namespace: common-services
+  allowlist:
+    body:
+    - field: chatId
+      type: string
+      description: "The chat ID for the message"
+    - field: authorId
+      type: string
+      description: "The author ID for the message"
+    - field: holidayName
+      type: string
+      description: "Holiday name for which to retrieve holidays - string - ex. 'jaanipäev'"
 
 prepare:
   assign:
@@ -16,7 +25,6 @@ prepare:
     authorId: "abc123" # ${incoming.params.authorId}
     holidayName: "jaanipäev" # ${incoming.params.input.split(",")[0]}
   next: makeApiCall
-
 
 makeApiCall:
   call: reflect.mock
