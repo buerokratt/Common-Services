@@ -17,6 +17,7 @@ declaration:
     - field: today
       type: string
       description: "The current date in ISO format - ex. 'yyyy-mm-dd'"
+
 prepare:
   assign:
     chatId: "1010" # ${incoming.params.chatId}

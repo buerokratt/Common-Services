@@ -20,6 +20,7 @@ declaration:
     - field: yearEnd
       type: string
       description: "The end of the year in ISO format - ex. 'yyyy-mm-dd'"
+
 prepare:
   assign:
     chatId: "1010" # ${incoming.params.chatId}

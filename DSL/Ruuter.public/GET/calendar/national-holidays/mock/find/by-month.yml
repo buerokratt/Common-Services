@@ -16,6 +16,7 @@ declaration:
     - field: month
       type: string
       description: "The incoming month for which to retrieve holidays - ex. 'mai' or 'veebruar'"
+
 prepare:
   assign:
     chatId: "1010"
