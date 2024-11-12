@@ -19,16 +19,16 @@ declaration:
         type: object
         description: "The month map for the query"
       - field: input
-        type: array
+        type: string
         description: "The input in the format of: indicator,months,years"
       - field: indicator
         type: string
         description: "The indicator for the query"
       - field: months
-        type: array
+        type: string
         description: "The months for the query"
       - field: years
-        type: array
+        type: string
         description: "The years for the query"
 
 prepareVariables:
