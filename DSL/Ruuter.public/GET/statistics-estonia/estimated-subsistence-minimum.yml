@@ -15,9 +15,6 @@ declaration:
       - field: authorId
         type: string
         description: "The author ID for the message"
-      - field: lastYear
-        type: string
-        description: "The last year for the query"
 
 prepareVariables:
   assign:

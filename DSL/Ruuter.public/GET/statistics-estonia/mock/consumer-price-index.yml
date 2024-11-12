@@ -1,8 +1,8 @@
 declaration:
   call: declare
   version: 0.1
-  name: "Consumer Price Index Query"
-  description: "Provides CPI change information per month"
+  name: "MOCK - Consumer Price Index Query"
+  description: "MOCK - Provides CPI change information per month"
   method: post
   accepts: json
   returns: json
@@ -15,21 +15,9 @@ declaration:
       - field: authorId
         type: string
         description: "The author ID for the message"
-      - field: monthMap
-        type: object
-        description: "The month map for the query"
       - field: input
         type: string
-        description: "The input in the format of: indicator,months,years"
-      - field: indicator
-        type: string
-        description: "The indicator for the query"
-      - field: months
-        type: string
-        description: "The months for the query"
-      - field: years
-        type: string
-        description: "The years for the query"
+        description: "The input in the format of: 'indicator,months,years'"
 
 prepareVariables:
   assign:

@@ -15,21 +15,9 @@ declaration:
       - field: authorId
         type: string
         description: "The author ID for the message"
-      - field: monthMap
-        type: object
-        description: "The month map for the query"
       - field: input
-        type: array
-        description: "The input in the format of: indicator,months,years"
-      - field: indicator
         type: string
-        description: "The indicator for the query"
-      - field: months
-        type: array
-        description: "The months for the query"
-      - field: years
-        type: array
-        description: "The years for the query"
+        description: "The input in the format of: 'indicator,months,years'"
 
 prepareVariables:
   assign:
