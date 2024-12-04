@@ -26,11 +26,11 @@ prepare:
     holiday: ${incoming.params.input}
     holidayMap:
       map:
-        "talve koolivaheaeg": "talvepuhkus"
-        "kevad koolivaheaeg": "kevadpühad"
-        "suve koolivaheaeg": "suvepuhkus"
-        "jõulu koolivaheaeg": "jõulupühad"
-        "sügis koolivaheaeg": "sügispuhkus"
+        "talve vaheaeg": "talvepuhkus"
+        "kevad vaheaeg": "kevadpühad"
+        "suve vaheaeg": "suvepuhkus"
+        "jõulu vaheaeg": "jõulupühad"
+        "sügis vaheaeg": "sügispuhkus"
     searchHoliday: ${holidayMap.map[holiday]}
     currentYear: "${new Date().getFullYear()}"
     startDate: "${new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0]}" # January 1st of the current year
