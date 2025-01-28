@@ -31,7 +31,19 @@ makeApiCall:
     headers:
       accept: application/json
   result: holidays
+
+checkHolidays:
+  switch:
+    - condition: ${holidays.response.statusCodeValue >= 400}
+      next: errorResponse
   next: formatHolidays
+
+errorResponse:
+  assign:
+    res: {
+      "result": "Kahjuks ei õnnestunud hetkel pühade andmeid laadida. See võib olla ajutine tehniline probleem. Palun proovige hiljem uuesti."
+    }
+  next: formatMessages
 
 formatHolidays:
   call: http.post

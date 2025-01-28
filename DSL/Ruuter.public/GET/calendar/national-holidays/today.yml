@@ -30,13 +30,21 @@ makeApiCall:
     headers:
       accept: application/json
   result: holiday
-  next: checkHoliday
 
-checkHoliday:
+checkHolidays:
   switch:
+    - condition: ${holiday.response.statusCodeValue >= 400}
+      next: errorResponse
     - condition: ${holiday.response.body.length == 0}
       next: assignNotFound
   next: assignResult
+
+errorResponse:
+  assign:
+    res: {
+      "result": "Kahjuks ei õnnestunud hetkel pühade andmeid laadida. See võib olla ajutine tehniline probleem. Palun proovige hiljem uuesti."
+    }
+  next: formatMessages
 
 assignNotFound:
   assign:
@@ -48,7 +56,7 @@ assignNotFound:
 assignResult:
   assign:
     res: {
-      "result": "Jah, täna on ${holiday.name}"
+      "result": "Jah, täna on ${holiday.response.body[0].name[0].text}"
     }
   next: formatMessages
 

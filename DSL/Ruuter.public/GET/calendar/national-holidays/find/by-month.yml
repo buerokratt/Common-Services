@@ -58,6 +58,8 @@ makeApiCall:
 
 checkHoliday:
   switch:
+    - condition: ${holidays.response.statusCodeValue >= 400}
+      next: errorResponse
     - condition: ${holidays.response.body.length == 0}
       next: holidayNotFound
     - condition: ${holidays.response.body.length == 1}
@@ -65,6 +67,13 @@ checkHoliday:
     - condition: ${holidays.response.body.length > 1}
       next: formatMultipleResponses
   next: holidayNotFound
+
+errorResponse:
+  assign:
+    res: {
+      "result": "Kahjuks ei õnnestunud hetkel pühade andmeid laadida. See võib olla ajutine tehniline probleem. Palun proovige hiljem uuesti."
+    }
+  next: formatMessages
 
 holidayNotFound:
   assign:

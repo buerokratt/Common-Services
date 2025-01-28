@@ -31,19 +31,18 @@ makeApiCall:
     headers:
       accept: application/json
   result: holidays
-  next: checkHolidays
 
 checkHolidays:
   switch:
-    - condition: ${holidays.response.body.length == 0}
-      next: assignNoHolidays
+    - condition: ${holidays.response.statusCodeValue >= 400}
+      next: errorResponse
   next: formatResult
 
-assignNoHolidays:
+errorResponse:
   assign:
     res: {
-      "result": "No national holidays found"
-      }
+      "result": "Kahjuks ei õnnestunud hetkel pühade andmeid laadida. See võib olla ajutine tehniline probleem. Palun proovige hiljem uuesti."
+    }
   next: formatMessages
 
 formatResult:
