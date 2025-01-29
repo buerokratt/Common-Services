@@ -31,7 +31,19 @@ getAllHolidays:
     headers:
       accept: application/json
   result: holidays
+
+checkHolidaysResponse:
+  switch:
+    - condition: ${holidays.response.statusCodeValue >= 400}
+      next: errorResponse
   next: formatResult
+
+errorResponse:
+  assign:
+    res: {
+      "result": "Kahjuks ei õnnestunud hetkel pühade andmeid laadida. See võib olla ajutine tehniline probleem. Palun proovige hiljem uuesti."
+    }
+  next: formatMessages
 
 formatResult:
   call: http.post

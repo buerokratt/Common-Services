@@ -32,7 +32,19 @@ getAllHolidays:
     headers:
       accept: application/json
   result: holidays
+
+checkHolidaysResponse:
+  switch:
+    - condition: ${holidays.response.statusCodeValue >= 400}
+      next: errorResponse
   next: checkHolidays
+
+errorResponse:
+  assign:
+    res: {
+      "result": "Kahjuks ei õnnestunud hetkel pühade andmeid laadida. See võib olla ajutine tehniline probleem. Palun proovige hiljem uuesti."
+    }
+  next: formatMessages
 
 checkHolidays:
   switch:
@@ -67,27 +79,6 @@ assignResponse:
   assign:
     res: ${formattedHolidays.response.body}
   next: formatMessages
-
-
-# checkHolidays:
-#   switch:
-#     - condition: "${holiday.response.body.length < 1}"
-#       next: assignNoHoliday
-#   next: assignResponse
-
-# assignNoHoliday:
-#   assign:
-#     res: {
-#       "result": "Hetkel pole koolivaheaega"
-#     }
-#   next: formatMessages
-
-# assignResponse:
-#   assign:
-#     res: {
-#       "result": "Hetkel on ${holiday.response.body[0].name[0].text}"
-#     }
-#   next: formatMessages
 
 formatMessages:
   call: http.post
