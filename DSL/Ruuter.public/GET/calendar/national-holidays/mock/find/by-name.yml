@@ -1,0 +1,119 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "MOCK - Holiday Search Service"
+  description: "MOCK - Searches for a national holiday by name in the 2024 calendar"
+  method: GET
+  accepts: JSON
+  returns: JSON
+  namespace: common-services
+  allowlist:
+    body:
+    - field: chatId
+      type: string
+      description: "The chat ID for the message"
+    - field: authorId
+      type: string
+      description: "The author ID for the message"
+    - field: holidayName
+      type: string
+      description: "Holiday name for which to retrieve holidays - string - ex. 'jaanipäev'"
+
+prepare:
+  assign:
+    chatId: "1010" # ${incoming.params.chatId}
+    authorId: "abc123" # ${incoming.params.authorId}
+    holidayName: "jaanipäev" # ${incoming.params.input.split(",")[0]}
+  next: makeApiCall
+
+makeApiCall:
+  call: reflect.mock
+  args:
+    url: "www.example.com"
+    response: 
+      holidays:
+        - date: "2024-01-01"
+          name: "uusaasta"
+        - date: "2024-02-24"
+          name: "iseseisvuspäev, Eesti Vabariigi aastapäev"
+        - date: "2024-03-29"
+          name: "suur reede"
+        - date: "2024-03-31"
+          name: "ülestõusmispühade 1. püha"
+        - date: "2024-05-01"
+          name: "kevadpüha"
+        - date: "2024-05-19"
+          name: "nelipühade 1. püha"
+        - date: "2024-06-23"
+          name: "võidupüha"
+        - date: "2024-06-24"
+          name: "jaanipäev"
+        - date: "2024-08-20"
+          name: "taasiseseisvumispäev"
+        - date: "2024-12-24"
+          name: "jõululaupäev"
+        - date: "2024-12-25"
+          name: "esimene jõulupüha"
+        - date: "2024-12-26"
+          name: "teine jõulupüha"
+  result: data
+  next: filterHolidays
+
+filterHolidays:
+  assign:
+    filteredHolidays: ${data.response.body.holidays.filter(holiday => holiday.name.toLowerCase().includes(holidayName.toLowerCase()))}
+  next: checkHoliday
+
+checkHoliday:
+  switch:
+    - condition: ${filteredHolidays.length < 1}
+      next: holidayNotFound
+  next: formatValue
+
+holidayNotFound:
+  assign:
+    res: {
+      "result": "Ei leia sellist riigipüha"
+    }
+  next: formatMessages 
+
+formatValue:
+  assign:
+    res: {
+      "result": "${filteredHolidays[0].name.charAt(0).toUpperCase() + filteredHolidays[0].name.slice(1)} on ${filteredHolidays[0].date}"
+    }
+  next: formatMessages
+
+formatMessages:
+  call: reflect.mock # http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+    response:
+      body:
+        - chatId: "1010"
+          content: "Jaanipäev on 2024-06-24"
+          buttons: []
+          authorTimestamp: "2024-11-05T12:00:00Z"
+          authorId: "abc123"
+          authorFirstName: ""
+          authorLastName: ""
+          created: "2024-11-05T12:00:00Z"
+  result: formatMessage
+  next: returnResult
+
+returnResult:
+  return: ${formatMessage.response.body}
+  next: end

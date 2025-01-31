@@ -1,0 +1,107 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "MOCK - Find Previous Holiday"
+  description: "MOCK - Returns most recent national holiday before today's date"
+  method: GET
+  accepts: JSON
+  returns: JSON
+  allowlist:
+    body:
+    - field: chatId
+      type: string
+      description: "The chat ID for the message"
+    - field: authorId
+      type: string
+      description: "The author ID for the message"
+    - field: today
+      type: string
+      description: "The current date in ISO format - ex. 'yyyy-mm-dd'"
+
+prepare:
+  assign:
+    chatId: "1010" # ${incoming.params.chatId}
+    authorId: "abc123" # ${incoming.params.authorId}
+    today: "2024-09-24" # ${new Date().toISOString().split("T")[0]}
+  next: makeApiCall
+
+makeApiCall:
+  call: reflect.mock
+  args:
+    url: "www.example.com"
+    response: 
+      holidays:
+        # --- Riigipühad ja puhkepäevad 2024 ---
+        - date: "2024-01-01"
+          name: "uusaasta"
+        - date: "2024-02-24"
+          name: "iseseisvuspäev, Eesti Vabariigi aastapäev"
+        - date: "2024-03-29"
+          name: "suur reede"
+        - date: "2024-03-31"
+          name: "ülestõusmispühade 1. püha"
+        - date: "2024-05-01"
+          name: "kevadpüha"
+        - date: "2024-05-19"
+          name: "nelipühade 1. püha"
+        - date: "2024-06-23"
+          name: "võidupüha"
+        - date: "2024-06-24"
+          name: "jaanipäev" 
+        - date: "2024-08-20"
+          name: "taasiseseisvumispäev"
+        - date: "2024-12-24"
+          name: "jõululaupäev"
+        - date: "2024-12-25"
+          name: "esimene jõulupüha"
+        - date: "2024-12-26"
+          name: "teine jõulupüha"
+  result: holiday_data
+  next: validateHoliday
+
+validateHoliday:
+  assign:
+    previousHoliday: ${holiday_data.response.body.holidays
+        .filter(holiday => holiday.date < today).sort((a, b) => new Date(b.date) - new Date(a.date))[0]}
+  next: formatValue
+
+formatValue:
+  assign:
+    res: {
+     "result": "Viimane riigipüha oli ${previousHoliday.name} - ${previousHoliday.date}"
+    }
+  next: formatMessages
+
+formatMessages:
+  call: reflect.mock # http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+    response:
+      body:
+        - chatId: "1010"
+          content: "Viimane riigipüha oli taasiseseisvumispäev - 2024-08-20"
+          buttons: []
+          authorTimestamp: "2024-11-05T12:00:00Z"
+          authorId: "abc123"
+          authorFirstName: ""
+          authorLastName: ""
+          created: "2024-11-05T12:00:00Z"
+  result: formatMessage
+  next: returnResult
+
+returnResult:
+  return: ${formatMessage.response.body}
+  next: end

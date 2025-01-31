@@ -1,0 +1,158 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "MOCK Employees"
+  description: "MOCK - Gets Companies Employees"
+  method: POST
+  accepts: JSON
+  returns: JSON
+  namespace: common-services
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Parameter 'chatId'"
+      - field: authorId
+        type: string
+        description: "Parameter 'authorId'"  
+      - field: registry_code
+        type: string
+        description: "Parameter 'registry_code'"
+      - field: county
+        type: string
+        description: "Parameter 'county'"
+
+extract_body:
+  assign:
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+    registry_code: ${incoming.body.input[0]}
+    county: ${incoming.body.input[0]}
+
+checkForParams:
+  switch:
+    - condition: ${registry_code != null}
+      next: getWithCode
+    - condition: ${county != null}
+      next: getWithCounty
+  next: getAll
+
+getWithCode:
+  call: reflect.mock
+  args:
+    url: "[#OPENSEARCH]/companies/_search/template"
+    body:
+      id: "company-with-code"
+      params: { registry_code: "${registry_code}", field: "workers" }
+  result: res
+  next: mapCodeData
+
+mapCodeData:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/get_employees_with_code"
+    headers:
+      type: "json"
+    body:
+      hits: ${res.response.body.hits.hits}
+  result: codeMappedData
+  next: checkMappedData
+
+checkMappedData:
+  switch:
+    - condition: ${codeMappedData.response.body.employees.length > 0}
+      next: assign_code_response
+  next: return_no_companies_found
+
+assign_code_response:
+  assign:
+    res: ${codeMappedData.response.body.employees[0]}
+  next: format_messages
+
+return_no_companies_found:
+  return: "No companies found"
+  next: end
+
+getWithCounty:
+  call: reflect.mock
+  args:
+    url: "[#OPENSEARCH]/companies/_search/template"
+    body:
+      id: "companies-with-county"
+      params: { county: "${county}", field: "workers" }
+  result: res
+  next: mapCountyData
+
+mapCountyData:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/get_total_with_county"
+    headers:
+      type: "json"
+    body:
+      aggregations: ${res.response.body.aggregations}
+  result: countyMappedData
+  next: assign_county_response
+
+assign_county_response:
+  assign:
+    res: ${countyMappedData.response.body}
+  next: format_messages
+
+getAll:
+  call: reflect.mock
+  args:
+    url: "[#OPENSEARCH]/companies/_search/template"
+    body:
+      id: "companies"
+      params: { field: "workers" }
+  result: res
+  next: mapAllData
+
+mapAllData:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/get_total"
+    headers:
+      type: "json"
+    body:
+      aggregations: ${res.response.body.aggregations}
+  result: allMappedData
+  next: assign_response
+
+assign_response:
+  assign:
+    res: ${allMappedData.response.body}
+  next: format_messages
+
+format_messages:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: formatted_messages_res
+  next: assignMock # return_result
+
+return_result:
+  return: ${formatted_messages_res.response.body}
+#-------------------------------------------------------------------------- 
+
+assignMock:
+  assign:
+    res:
+      result: "Ettevõttes MockCompany OÜ töötab 10 inimest."
+
+returnResult:
+  return: ${res}
