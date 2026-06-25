@@ -1,0 +1,18 @@
+{
+  "script": {
+    "lang": "mustache",
+    "source": {
+      "size": 0,
+      "aggs": {
+        "result": {
+          "sum": {
+            "field": "{{field}}"
+          }
+        }
+      }
+    },
+    "params": {
+      "field": ""
+    }
+  }
+}

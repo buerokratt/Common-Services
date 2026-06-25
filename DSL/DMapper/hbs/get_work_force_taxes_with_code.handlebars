@@ -1,0 +1,10 @@
+{
+    "work_force_taxes": [
+    {{#each hits}}
+            {
+              "result": "{{ _source.labor_taxes_and_payments }}",
+              "text": "{{ _source.name }} on {{../year}}. aasta eelmisel kvartalil tasunud tööjõumakse kokku summas {{ formatToReadableNumber _source.labor_taxes_and_payments }} eurot."
+            }{{#unless @last}},{{/unless}}
+    {{/each}}
+    ]
+}

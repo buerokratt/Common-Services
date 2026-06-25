@@ -1,0 +1,76 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "MOCK - Current electricity Price Service"
+  description: "MOCK - This service fetches electricity prices for the current hour"
+  method: POST
+  accepts: JSON
+  returns: JSON
+  namespace: common-services
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "The chat ID for the message"
+      - field: authorId
+        type: string
+        description: "The author ID for the message"
+
+# Prepare Dates based on today
+prepare:
+  assign:
+    chatId: ${incoming.params.chatId}
+    authorId: ${incoming.params.authorId}
+  next: priceForToday
+
+priceForToday:
+  call: http.get
+  args:
+    url: https://dashboard.elering.ee/api/nps/price/EE/current
+  result: eleringToday
+  next: assignVariables
+
+assignVariables:
+  assign:
+    price: "${eleringToday.response.body.data[0].price}"
+  next: assignResponse
+
+assignResponse:
+  assign:
+    res: {
+      "result": "Antud tunnil on elektri börsihind ${price} €/mWh"
+      }
+  next: formatMessages
+
+formatMessages:
+  call: reflect.mock # http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+    response:
+      body:
+        - chatId: "1010"
+          content: "Antud tunnil on elektri börsihind 89.23 €/mWh"
+          buttons: []
+          authorTimestamp: "2024-11-05T12:00:00Z"
+          authorId: "abc123"
+          authorFirstName: ""
+          authorLastName: ""
+          created: "2024-11-05T12:00:00Z"
+  result: formatMessage
+  next: returnResult
+
+returnResult:
+  return: ${formatMessage.response.body}

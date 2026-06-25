@@ -1,0 +1,143 @@
+declaration:
+  call: declare
+  version: 0.1
+  name: "MOCK - Electricity Price Service"
+  description: "MOCK -This service fetches the lowest electricity prices for today"
+  method: POST
+  accepts: JSON
+  returns: JSON
+  namespace: common-services
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "The chat ID for the message"
+      - field: authorId
+        type: string
+        description: "The author ID for the message"
+      - field: startDateTime
+        type: string
+        description: "Parameter 'startDateTime' - 'yyyy-mm-ddT00:00:00.000Z' - UTC"
+      - field: endDateTime
+        type: string
+        description: "Parameter 'endDateTime'- - 'yyyy-mm-ddT00:00:00.000Z' - UTC"
+
+prepare:
+  assign:
+    chatId: "1010" # ${incoming.params.chatId}
+    authorId: "abc123" # ${incoming.params.authorId}
+    startDateTime: "${new Date(new Date().getTime() - 24 * 60 * 60 * 1000).toISOString().split('T')[0] + 'T21:00:00.000Z'}"
+    endDateTime: "${new Date().toISOString().split('T')[0] + 'T20:59:59.000Z'}"
+  next: priceForToday
+
+priceForToday:
+  call: reflect.mock
+  args:
+    request:
+      url: https://dashboard.elering.ee/api/nps/price
+      query:
+        start: ${startDateTime}
+        end: ${endDateTime}
+    response:
+        data:
+          ee: # mock data
+            - timestamp: 1728507600
+              price: 6.9500
+            - timestamp: 1728511200
+              price: 58.6900
+            - timestamp: 1728514800
+              price: 45.6700
+            - timestamp: 1728518400
+              price: 24.9100
+            - timestamp: 1728522000
+              price: 12.8900
+            - timestamp: 1728525600
+              price: 14.2400
+            - timestamp: 1728529200
+              price: 38.8700
+            - timestamp: 1728532800
+              price: 61.6000
+            - timestamp: 1728536400
+              price: 86.7100
+            - timestamp: 1728540000
+              price: 80.4600
+            - timestamp: 1728543600
+              price: 67.5000
+            - timestamp: 1728547200
+              price: 24.9800
+            - timestamp: 1728550800
+              price: 24.7400
+            - timestamp: 1728554400
+              price: 21.8300
+            - timestamp: 1728558000
+              price: 15.9400
+            - timestamp: 1728561600
+              price: 19.7800
+            - timestamp: 1728565200
+              price: 20.1100
+            - timestamp: 1728568800
+              price: 17.9100
+            - timestamp: 1728572400
+              price: 70.0200
+            - timestamp: 1728576000
+              price: 70.0600
+            - timestamp: 1728579600
+              price: 27.0300
+            - timestamp: 1728583200
+              price: 6.1600
+            - timestamp: 1728586800
+              price: 3.3200
+            - timestamp: 1728590400
+              price: 0.0000
+  result: eleringToday
+  next: assignVariables
+
+assignVariables:
+  assign:
+    minPrice: ${eleringToday.response.body.data.ee.sort((a, b) => a.price - b.price)[0].price}
+    minPriceTimestamp: ${eleringToday.response.body.data.ee.sort((a, b) => a.price - b.price)[0].timestamp}
+    tallinnOffset: 7200
+    adjustedTimestamp: ${minPriceTimestamp + tallinnOffset} 
+    adjustedHour: ${Math.floor((adjustedTimestamp % 86400) / 3600)}
+    timeVar: ${("0" + adjustedHour).slice(-2) + ":00"}
+  next: assignResponse
+
+assignResponse:
+  assign:
+    res: {
+      "result": "Täna on madalaim elektri börsihind ${minPrice} €/mWh, kell ${timeVar}"
+    }
+  next: formatMessages
+
+formatMessages:
+  call: reflect.mock # http.post
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${[res]}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+    response:
+      body:
+        - chatId: "1010"
+          content: "Täna on madalaim elektri börsihind 3.82 €/mWh, kell 02:00"
+          buttons: []
+          authorTimestamp: "2024-11-05T12:00:00Z"
+          authorId: "abc123"
+          authorFirstName: ""
+          authorLastName: ""
+          created: "2024-11-05T12:00:00Z"
+  result: formatMessage
+  next: returnResult
+
+returnResult:
+  return: ${formatMessage.response.body}

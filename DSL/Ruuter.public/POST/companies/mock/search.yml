@@ -1,0 +1,118 @@
+declaration:
+ call: declare
+ version: 0.1
+ name: "MOCK - Search"
+ description: "MOCK - Search service to trigger and companies by name"
+ method: POST
+ accepts: JSON
+ returns: JSON
+ namespace: common-services
+ allowlist:
+   params:
+     - field: chatId
+       type: string
+       description: "Parameter 'chatId'"
+     - field: authorId
+       type: string
+       description: "Parameter 'authorId'"
+     - field: input
+       type: array 
+       description: "input array for serviceName and name"
+     - field: serviceName
+       type: string
+       description: "service name to trigger"
+     - field: name
+       type: string
+       description: "company 'name'"  
+
+
+assign_values:
+  assign:
+    chatId: ${incoming.body.chatId}
+    authorId: ${incoming.body.authorId}
+    input: ${incoming.body.input}
+    serviceName: ${input[0]}
+    name: ${input[1]}
+
+    buttonPrefix: "#common_service, /POST/companies/${serviceName}, ("
+
+getCompaniesWithName:
+  call: reflect.mock
+  args:
+    url: "[#OPENSEARCH]/companies/_search/template"
+    body:
+      id: "company-with-name"
+      params: {
+        name: "${name}"
+      }
+  result: res
+
+mapData:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/get_company_with_name"
+    headers:
+      type: "json"
+    body:
+      hits: ${res.response.body.hits.hits}
+  result: mappedData
+
+addButtonsToFirstBotMessage:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/add_buttons_to_first_message"
+    headers:
+      type: json
+    body:
+      messages: ${[mappedData.response.body.companies[0]]}
+      ignoreTexts: []
+      prefix: ${buttonPrefix}
+      companies: ${mappedData.response.body.companies}
+  result: merged_messages_res
+  next: extractMergedResult
+
+extractMergedResult:
+  assign:
+    botMsg: ${merged_messages_res.response.body}
+  next: # format_messages
+
+format_messages:
+  call: reflect.mock
+  args:
+    url: "[#DMAPPER]/common-services/hbs/bot_responses_to_messages"
+    headers:
+      type: json
+    body:
+      data:
+        {
+          "botMessages": "${botMsg}",
+          "chatId": "${chatId}",
+          "authorId": "${authorId}",
+          "authorFirstName": "",
+          "authorLastName": "",
+          "authorTimestamp": "${new Date().toISOString()}",
+          "created": "${new Date().toISOString()}",
+        }
+  result: res
+  next: assignMock # return_result
+
+return_result:
+  return: ${res.response.body}
+  next: end
+
+assignMock:
+  assign:
+    res:
+      result:
+        - chatId: "mock_chat_id_12345"
+          content: ""
+          buttons: "[{\"title\": \"MockCompany OÜ\",\"payload\": \"#common_service, /POST/companies/revenues, (12345467)\"}]"
+          authorTimestamp: "2024-11-20T11:44:35.293Z"
+          authorId: "mock_author_id_67890"
+          authorFirstName: ""
+          authorLastName: ""
+          created: "2024-11-20T11:44:35.294Z"
+  next: returnResult
+
+returnResult:
+  return: ${res}

@@ -1,0 +1,10 @@
+{
+    "employees": [
+    {{#each hits}}
+            {
+              "text": "Ettevõttes {{ _source.name }} töötab {{ _source.workers }} inimest.",
+              "result": "{{ _source.name }}"
+            }{{#unless @last}},{{/unless}}
+    {{/each}}
+    ]
+}
